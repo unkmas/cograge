@@ -11,6 +11,7 @@ Written by Dmitry A. Ustalov.
 * Render it's orthogonal projection.
 
 Allow user to:
+
 * Parallel Translation.
 * Scaling.
 * Rotation (on any axis).
