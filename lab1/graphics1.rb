@@ -13,8 +13,9 @@ class Lab
   attr_reader :scene
 
   def initialize
-    @zoom = 0.0
-    @shift = 0.0
+    @zoom = 1.0
+    @shift_x = 0.0
+    @shift_y = 0.0
     @rotate = 0
 
     # Load and prepare verteces
@@ -57,6 +58,10 @@ class Lab
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity
 
+    # Translate scene
+    glTranslatef(@shift_x, @shift_y, 0.0)
+    glScalef(@zoom, @zoom, 1.0)
+
     # Rotate scene on the Z-axis
     glRotatef(@rotate, 0.0, 0.0, 1.0)
 
@@ -74,15 +79,16 @@ class Lab
   end
 
   def reshape w, h
+    h = 1 if h == 0
     glViewport(0, 0, w, h);
-    glMatrixMode(Gl::GL_PROJECTION);
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     if (w <= h)
       glOrtho(-1.5, 1.5, -1.5 * h/w, 1.5 * h/w, -10.0, 10.0);
     else
       glOrtho(-1.5 * w/h, 1.5 * w/h, -1.5, 1.5, -10.0, 10.0);
     end
-    glMatrixMode(Gl::GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);
   end
 
   def idle
@@ -95,20 +101,25 @@ class Lab
       when ?\e
         glutDestroyWindow(@window)
         exit 0
-      # w, a, s, d: take a look around
+      # w, a, s, d: translate
       when 119 # w
-        @zoom += 0.05
-      when 115 # a
-        @zoom -= 0.05
-      when 97  # s
-        @shift -= 0.05
+        @shift_y += 0.05
+      when 97 # a
+        @shift_x -= 0.05
+      when 115  # s
+        @shift_y -= 0.05
       when 100 # d
-        @shift += 0.05
+        @shift_x += 0.05
       # q, e: rotate
       when 113 # q
         @rotate -= 1
       when 101 # e
         @rotate += 1
+      # i, o: zoom in/out
+      when 105
+        @zoom += 0.05
+      when 111
+        @zoom -= 0.05
       else
         p key
     end
@@ -116,4 +127,9 @@ class Lab
   end
 end
 
+puts <<EOF
+  W, A, S, D : translate
+  Q, E       : rotate
+  I, O       : scale
+EOF
 Lab.new
