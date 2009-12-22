@@ -1,4 +1,5 @@
-#encoding: utf-8
+#!/usr/bin/env ruby
+##encoding: utf-8
 
 require 'rubygems'
 require 'opengl'
@@ -63,7 +64,7 @@ class BezierCurves
   end
   private :reshape
 
-  def keyboard
+  def keyboard key, x, y
     case (key)
     when ?\e
       exit(0)
