@@ -3,7 +3,7 @@ require 'opengl'
 require 'mathn'
 require 'singleton'
 
-include Gl,Glu,Glut
+include Gl, Glu, Glut
 
 class BezMesh
   include Singleton
