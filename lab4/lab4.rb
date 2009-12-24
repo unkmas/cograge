@@ -15,20 +15,23 @@ class AlphaChannel
     glutInitWindowSize 500, 500
     glutInitWindowPosition 100, 100
     glutCreateWindow "Computer graphics and geometry: Z-buffer (lab 4)"
-    init
+    glInit
     glutReshapeFunc method(:reshape).to_proc
     glutKeyboardFunc method(:keyboard).to_proc
     glutDisplayFunc method(:display).to_proc
     glutMainLoop
   end
 
-  def init
-    glEnable GL_BLEND
-    glBlendFunc GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
-    glShadeModel GL_FLAT
-    glClearColor 0.0, 0.0, 0.0, 0.0
+  def glInit
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glShadeModel(GL_FLAT);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glEnable(GL_CULL_FACE);
   end
-  private :init
+  private :glInit
 
   def draw_left_triangle
     glBegin GL_TRIANGLES
@@ -51,7 +54,7 @@ class AlphaChannel
   private :draw_right_triangle
 
   def display
-    glClear GL_COLOR_BUFFER_BIT
+    glClear GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
     draw_left_triangle
     draw_right_triangle
     glutSwapBuffers
