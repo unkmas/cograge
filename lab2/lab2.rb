@@ -62,9 +62,9 @@ class BezierCurves
   private :reshape
 
   def keyboard key, x, y
-    case (key)
+    case key
     when ?\e
-      exit(0)
+      exit 0
     end
   end
   private :keyboard

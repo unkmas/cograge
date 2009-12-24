@@ -1,88 +1,72 @@
-#!/usr/bin/env ruby
-#encoding: utf-8
-
 require 'rubygems'
 require 'opengl'
+require 'mathn'
+require 'singleton'
 
-include Gl, Glu, Glut
+include Gl,Glu,Glut
 
-class BezierMeshes
+class BezMesh
+  include Singleton
+
   def initialize
-    @ctrlpoints = YAML.load_file "scene.yaml"
-    glutInit()
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
-    glutInitWindowSize(500, 500)
-    glutInitWindowPosition(100, 100)
-    glutCreateWindow($0)
-    gl_init()
-    glutReshapeFunc(method(:reshape).to_proc)
-    glutDisplayFunc(method(:display).to_proc)
-    glutKeyboardFunc(method(:keyboard).to_proc)
-    glutMainLoop()
+    glutInit
+    glutInitDisplayMode GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH
+    glutInitWindowSize 500, 500
+    glutInitWindowPosition 100, 100
+    glutCreateWindow "Computer graphics and geometry: Bezier meshes (lab 3)"
+    gl_init
+    glutDisplayFunc method(:display).to_proc
+    glutReshapeFunc method(:reshape).to_proc
+    glutKeyboardFunc method(:keyboard).to_proc
+    glutMainLoop
   end
 
-  def initlights
-    ambient = [0.2, 0.2, 0.2, 1.0]
-    position = [0.0, 0.0, 2.0, 1.0]
-    mat_diffuse = [0.6, 0.6, 0.6, 1.0]
+  def gl_init
     mat_specular = [1.0, 1.0, 1.0, 1.0]
-    mat_shininess = [50.0]
-
-    glEnable(GL_LIGHTING)
-    glEnable(GL_LIGHT0)
-
-    glLight(GL_LIGHT0, GL_AMBIENT, ambient)
-    glLight(GL_LIGHT0, GL_POSITION, position)
-
-    glMaterial(GL_FRONT, GL_DIFFUSE, mat_diffuse)
-    glMaterial(GL_FRONT, GL_SPECULAR, mat_specular)
-    glMaterial(GL_FRONT, GL_SHININESS, mat_shininess)
+    light_position = [1.0, 1.0, 1.0, 0.0]
+    diffuse_material = [0.5, 0.5, 0.5, 1.0]
+    glClearColor 0.0, 0.0, 0.0, 0.0
+    glShadeModel GL_SMOOTH
+    glEnable GL_DEPTH_TEST
+    glMaterial GL_FRONT, GL_DIFFUSE, diffuse_material
+    glMaterial GL_FRONT, GL_SPECULAR, mat_specular
+    glMaterial GL_FRONT, GL_SHININESS, 25.0
+    glLight GL_LIGHT0, GL_POSITION, light_position
+    glEnable GL_LIGHTING
+    glEnable GL_LIGHT0
+    glColorMaterial GL_FRONT, GL_DIFFUSE
+    glEnable GL_COLOR_MATERIAL
   end
-  private :initlights
+  private :gl_init
 
   def display
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glPushMatrix()
-    glRotate(85.0, 1.0, 1.0, 1.0)
-    glEvalMesh2(GL_FILL, 0, 20, 0, 20)
-    glPopMatrix()
+    glClear GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+    glutSolidSphere 1.0, 20, 16
     glutSwapBuffers()
   end
   private :display
 
   def reshape w, h
-    glViewport(0, 0, w, h)
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    if (w <= h)
-      glOrtho(-4.0, 4.0, -4.0 * h / w, 4.0 * h / w, -4.0, 4.0)
+    glViewport 0, 0,  w,  h
+    glMatrixMode GL_PROJECTION
+    glLoadIdentity
+    if  w <= h
+      glOrtho -1.5, 1.5, -1.5 * h / w, 1.5 * h / w, -10.0, 10.0
     else
-      glOrtho(-4.0 * w / h, 4.0 * w / h, -4.0, 4.0, -4.0, 4.0)
+      glOrtho -1.5 * w / h, 1.5 * w / h, -1.5, 1.5, -10.0, 10.0
     end
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
+    glMatrixMode GL_MODELVIEW
+    glLoadIdentity
   end
   private :reshape
 
   def keyboard key, x, y
-    case (key)
+    case key
     when ?\e
-      exit(0);
+      exit 0
     end
   end
   private :keyboard
-
-  def gl_init
-    glClearColor(0.0, 0.0, 0.0, 1.0)
-    glEnable(GL_DEPTH_TEST)
-    glMap2d(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, @ctrlpoints.flatten)
-    glEnable(GL_MAP2_VERTEX_3)
-    glEnable(GL_AUTO_NORMAL)
-    glEnable(GL_NORMALIZE)
-    glMapGrid2d(20, 0.0, 1.0, 20, 0.0, 1.0)
-    initlights()
-  end
-  private :gl_init
 end
 
-BezierMeshes.new
+BezMesh.instance
