@@ -2,12 +2,14 @@
 ##encoding: utf-8
 
 require 'rubygems'
+require 'singleton'
 require 'opengl'
 require 'yaml'
 
 include Gl, Glu, Glut
 
 class BezierCurves
+  include Singleton
   def initialize
     @ctrlpoints = YAML.load_file 'scene.yaml'
 
@@ -27,25 +29,20 @@ class BezierCurves
   def init_gl_window
     glClearColor 0.0, 0.0, 0.0, 0
     glShadeModel GL_FLAT
-    glMap1d(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, @ctrlpoints.flatten)
-    glEnable(GL_MAP1_VERTEX_3)    
   end
 
   def display
     glClear GL_COLOR_BUFFER_BIT
     glColor 1.0, 1.0, 1.0
-    glBegin GL_LINE_STRIP
-    for i in 0..30
-      glEvalCoord1d i / 30.0
+    @ctrlpoints.each do |arc|
+      glMap1d GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, arc.flatten
+      glEnable GL_MAP1_VERTEX_3
+      glBegin GL_LINE_STRIP
+      for i in 0..30
+        glEvalCoord1d i / 30.0
+      end
+      glEnd
     end
-    glEnd
-    glPointSize 5.0
-    glColor 1.0, 1.0, 0.0
-    glBegin GL_POINTS
-    for i in 0...4
-      glVertex @ctrlpoints[i]
-    end
-    glEnd
     glutSwapBuffers
   end
   private :display
@@ -73,4 +70,4 @@ class BezierCurves
   private :keyboard
 end
 
-BezierCurves.new
+BezierCurves.instance
