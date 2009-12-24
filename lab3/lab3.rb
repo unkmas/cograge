@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'rubygems'
 require 'opengl'
 require 'mathn'
@@ -36,11 +38,23 @@ class BezMesh
     glEnable GL_LIGHT0
     glColorMaterial GL_FRONT, GL_DIFFUSE
     glEnable GL_COLOR_MATERIAL
+    @shift_x, @shift_y = 0.0, 0.0
+    @rotate_x, @rotate_y, @rotate_z = 0.0, 0.0, 0.0
   end
   private :gl_init
 
   def display
     glClear GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+    glLoadIdentity
+
+    # Translate scene
+    glTranslatef(@shift_x, @shift_y, 0)
+
+    # Rotate scene
+    glRotatef(@rotate_x, 1.0, 0.0, 0.0)
+    glRotatef(@rotate_y, 0.0, 1.0, 0.0)
+    glRotatef(@rotate_z, 0.0, 0.0, 1.0)
+
     glutSolidSphere 1.0, 20, 16
     glutSwapBuffers()
   end
@@ -62,11 +76,39 @@ class BezMesh
 
   def keyboard key, x, y
     case key
-    when ?\e
-      exit 0
+      # w, a, s, d: translate
+      when ?w
+        @shift_y += 0.05
+      when ?a
+        @shift_x -= 0.05
+      when ?s
+        @shift_y -= 0.05
+      when ?d
+        @shift_x += 0.05
+      # y, u, h, j, n, m: rotate
+      when ?y
+        @rotate_x -= 1
+      when ?u
+        @rotate_x += 1
+      when ?h
+        @rotate_y -= 1
+      when ?j
+        @rotate_y += 1
+      when ?n
+        @rotate_z -= 1
+      when ?m
+        @rotate_z += 1
+      when ?\e
+        glutDestroyWindow(@window)
+        exit 0
     end
+    glutPostRedisplay
   end
   private :keyboard
 end
 
+puts <<EOF
+  W, A, S, D       : translate
+  Y, U, H, J, N, M : rotate
+EOF
 BezMesh.instance
