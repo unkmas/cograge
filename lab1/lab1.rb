@@ -21,7 +21,7 @@ class Lab
     @rotate_x = 0.0
     @rotate_y = 0.0
     @rotate_z = 0.0
-    @trans = -1.0
+    @trans = 0.0
 
     # Load and prepare verteces
     raw = YAML.load_file('scene.yaml')
@@ -68,10 +68,10 @@ class Lab
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     # Reset the view
-    #glMatrixMode(GL_MODELVIEW)
-    #glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity();
     glPushMatrix();
-    glTranslate(0.0, 0.0, @trans);
+    glTranslate(0.0, 0.0, @trans - 3.0);
 
     # Translate scene
     glTranslatef(@shift_x, @shift_y, 0)
